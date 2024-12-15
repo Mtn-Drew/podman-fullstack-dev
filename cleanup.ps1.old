@@ -1,0 +1,44 @@
+# Stop and remove compose environment
+Write-Host "Stopping compose environment..."
+podman-compose down
+
+# Stop and remove all containers
+Write-Host "Removing all containers..."
+podman stop $(podman ps -aq)
+podman rm $(podman ps -aq)
+
+# Remove all pods
+Write-Host "Removing all pods..."
+podman pod rm $(podman pod ls -q)
+
+# Remove all images
+Write-Host "Removing all images..."
+podman rmi $(podman images -q) -f
+
+# Remove volumes
+Write-Host "Removing volumes..."
+podman volume rm $(podman volume ls -q)
+
+# Remove custom networks
+Write-Host "Removing custom networks..."
+$networks = podman network ls --format "{{.Name}}" | Where-Object { $_ -ne "podman" }
+foreach ($network in $networks) {
+    podman network rm $network
+}
+
+# Final cleanup
+Write-Host "Final system prune..."
+podman system prune -f
+
+# Show current state
+Write-Host "Current State:"
+Write-Host "Containers:"
+podman ps -a
+Write-Host "Images:"
+podman images
+Write-Host "Volumes:"
+podman volume ls
+Write-Host "Networks:"
+podman network ls
+Write-Host "Pods:"
+podman pod ls

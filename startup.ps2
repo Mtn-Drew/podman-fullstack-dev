@@ -1,0 +1,30 @@
+# Startup script for Podman fullstack environment
+# startup.ps1
+
+Write-Host "Starting Podman fullstack environment..."
+
+# Run cleanup first
+Write-Host "Cleaning up previous environment..."
+.\cleanup.ps1
+
+# Start services
+Write-Host "Starting services..."
+podman-compose up -d
+
+# Wait for services to start
+Write-Host "Waiting for services to initialize..."
+Start-Sleep -Seconds 5
+
+# Check service status
+Write-Host "Checking service status..."
+podman ps
+
+Write-Host "Service URLs:"
+Write-Host "Frontend: http://localhost:3000"
+Write-Host "Backend:  http://localhost:4000"
+Write-Host "Database: localhost:5432"
+
+Write-Host "Logs can be viewed with:"
+Write-Host "podman logs -f podman-fullstack_frontend_1"
+Write-Host "podman logs -f podman-fullstack_backend_1"
+Write-Host "podman logs -f podman-fullstack_db_1"
